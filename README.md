@@ -16,6 +16,12 @@ If the repo already exists, the best NORNR sequence is:
 
 Budget Shield is the install-first proof in that sequence.
 
+## Live proof
+
+- Public action repo: [NORNR/nornr-budget-shield](https://github.com/NORNR/nornr-budget-shield)
+- Public demo repo: [NORNR/nornr-budget-shield-demo](https://github.com/NORNR/nornr-budget-shield-demo)
+- Live demo pull request: [NORNR/nornr-budget-shield-demo#1](https://github.com/NORNR/nornr-budget-shield-demo/pull/1)
+
 ## Why teams install it
 
 Use Budget Shield when you want NORNR to show up:
@@ -51,7 +57,9 @@ The output is intentionally calm:
 
 - which file changed
 - what kind of consequential surface appeared
-- which NORNR lane or control path likely fits before merge
+- which NORNR lane likely fits before merge
+- why that lane is the right fit
+- where the team should go next inside NORNR
 
 ## What it does not do
 
@@ -137,7 +145,10 @@ This pull request appears to introduce consequential execution surfaces that may
 
 - `src/runtime/payments.ts` — Payment or checkout surface, External provider or vendor action
   - `const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);`
-  - Suggested next step: Consider browser checkout governance, finance close packet or a vendor-procurement lane before this merges ungoverned.
+  - Likely NORNR surface: browser checkout governance
+  - Why this lane: A spend path and an external counterparty appear in the same change.
+  - Suggested next step: Route the new spend path through one reviewed release lane before merge so the payment surface keeps counterparty posture, approval state and finance-safe export attached.
+  - Learn more: https://nornr.com/browser-checkout-governance
 ```
 
 ## What a good install looks like

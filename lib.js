@@ -25,6 +25,25 @@ const DEFAULT_RULES = [
   },
 ];
 
+const LANE_SURFACES = {
+  browser: {
+    label: "browser checkout governance",
+    url: "https://nornr.com/browser-checkout-governance",
+  },
+  mcp: {
+    label: "MCP control server",
+    url: "https://nornr.com/mcp-control-server",
+  },
+  wrappers: {
+    label: "spend-aware wrappers",
+    url: "https://nornr.com/spend-aware-wrappers",
+  },
+  runtime: {
+    label: "governed runtime",
+    url: "https://nornr.com/governed-runtime",
+  },
+};
+
 export function createBudgetShieldRuntime(env = process.env) {
   return {
     eventPath: env.GITHUB_EVENT_PATH ?? "",
@@ -116,6 +135,78 @@ function dedupeMatches(matches) {
   });
 }
 
+function summarizeRuleIds(matches) {
+  return new Set(matches.map((match) => match.ruleId));
+}
+
+export function inferLane(matches) {
+  const ruleIds = summarizeRuleIds(matches);
+  const hasPayment = ruleIds.has("payment-surface");
+  const hasTool = ruleIds.has("tool-surface");
+  const hasVendor = ruleIds.has("vendor-action");
+
+  if (hasPayment && hasTool) {
+    return {
+      surface: LANE_SURFACES.runtime,
+      why: "Tool authority and spend release appear in the same diff.",
+      nextStep:
+        "Treat this as one governed runtime lane before merge so tool authority, counterparty scope, review posture and finance packet stay tied to the same decision path.",
+    };
+  }
+
+  if (hasTool && hasVendor) {
+    return {
+      surface: LANE_SURFACES.mcp,
+      why: "Tool authority and external provider access appear together.",
+      nextStep:
+        "Put the new capability behind one MCP control layer before merge so the tool path clears mandate, counterparty scope and review instead of raw client authority.",
+    };
+  }
+
+  if (hasPayment && hasVendor) {
+    return {
+      surface: LANE_SURFACES.browser,
+      why: "A spend path and an external counterparty appear in the same change.",
+      nextStep:
+        "Route the new spend path through one reviewed release lane before merge so the payment surface keeps counterparty posture, approval state and finance-safe export attached.",
+    };
+  }
+
+  if (hasTool) {
+    return {
+      surface: LANE_SURFACES.mcp,
+      why: "A new tool or MCP surface appears in added code.",
+      nextStep:
+        "Add one MCP control layer before merge so the tool request becomes intent with review and audit export instead of raw local capability.",
+    };
+  }
+
+  if (hasPayment) {
+    return {
+      surface: LANE_SURFACES.browser,
+      why: "A new payment or checkout path appears in added code.",
+      nextStep:
+        "Put the release path behind one reviewed spend lane before merge so the payment flow keeps owner mandate, approval state and finance packet explicit.",
+    };
+  }
+
+  if (hasVendor) {
+    return {
+      surface: LANE_SURFACES.wrappers,
+      why: "A new provider or vendor-action path appears in added code.",
+      nextStep:
+        "Use one spend-aware ingress before merge so the new provider call carries counterparty scope, review posture and defended trail instead of a raw client call.",
+    };
+  }
+
+  return {
+    surface: LANE_SURFACES.runtime,
+    why: "The diff introduces a consequential path that deserves one named NORNR lane.",
+    nextStep:
+      "Name one governed lane before merge so the control story stays explicit while the code review is still cheap.",
+  };
+}
+
 export function buildComment(findings, config) {
   if (!findings.length) {
     return `${MARKER}
@@ -135,12 +226,15 @@ No high-signal new tool, payment or vendor-action surfaces were detected in this
 
   for (const finding of findings) {
     const labels = [...new Set(finding.matches.map((match) => match.label))];
+    const lane = inferLane(finding.matches);
     lines.push(`- \`${finding.file}\` — ${labels.join(", ")}`);
     for (const match of finding.matches.slice(0, 3)) {
       lines.push(`  - \`${truncate(match.content, 120)}\``);
     }
-    const suggestions = [...new Set(finding.matches.map((match) => match.suggestion))];
-    lines.push(`  - Suggested next step: ${suggestions[0]}`);
+    lines.push(`  - Likely NORNR surface: ${lane.surface.label}`);
+    lines.push(`  - Why this lane: ${lane.why}`);
+    lines.push(`  - Suggested next step: ${lane.nextStep}`);
+    lines.push(`  - Learn more: ${lane.surface.url}`);
   }
 
   lines.push("");
