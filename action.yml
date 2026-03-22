@@ -1,5 +1,9 @@
 name: NORNR Budget Shield
 description: Comment on a pull request when new tool, payment or vendor-action surfaces appear without an explicit NORNR control story.
+author: NORNR
+branding:
+  icon: shield
+  color: gray-dark
 inputs:
   node-version:
     description: Node.js version used to run the audit script
