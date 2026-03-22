@@ -7,6 +7,15 @@ comment on a pull request when new tool, payment, MCP, or vendor-action surfaces
 This is not a generic lint rule.
 It is a review-first control layer for consequential execution while the merge is still cheap.
 
+If the repo already exists, the best NORNR sequence is:
+
+1. run [Governance Audit](https://nornr.com/governance-audit) on the repo
+2. install Budget Shield in pull requests
+3. deepen the first governed lane with wrappers or MCP
+4. carry the same lane into finance-safe proof later
+
+Budget Shield is the install-first proof in that sequence.
+
 ## Why teams install it
 
 Use Budget Shield when you want NORNR to show up:
@@ -23,17 +32,33 @@ It is best for teams building:
 - browser automation with paid or risky actions
 - AI workflows that can touch vendors, billing, or real budgets
 
-## What it flags
+## Try it in 60 seconds
+
+1. add the workflow below to `.github/workflows/nornr-budget-shield.yml`
+2. optionally add `.nornr-pr-audit.json` in repo root
+3. open or update a pull request that adds a payment, tool, MCP, or vendor-action surface
+
+If the action finds a new consequential surface, it leaves one calm NORNR comment on the pull request.
+
+## What it catches
 
 - payment or checkout surfaces
 - tool or MCP surfaces
 - external provider or vendor actions
+- first-seen consequential execution patterns that deserve an explicit NORNR lane before merge
 
 The output is intentionally calm:
 
 - which file changed
 - what kind of consequential surface appeared
 - which NORNR lane or control path likely fits before merge
+
+## What it does not do
+
+- it does not block merges on its own
+- it does not replace runtime policy, review, or finance packet logic
+- it does not try to comment on every code smell in the repo
+- it should stay narrow enough that teams trust the comment instead of muting it
 
 ## Install in 60 seconds
 
@@ -62,6 +87,8 @@ jobs:
           severity: review-first
 ```
 
+Full workflow example: [`examples/pull-request.yml`](./examples/pull-request.yml)
+
 ## Optional config
 
 Budget Shield looks for `.nornr-pr-audit.json` in the target repository root.
@@ -84,6 +111,7 @@ Start with this:
 ```
 
 Full example: [`.nornr-pr-audit.json.example`](./.nornr-pr-audit.json.example)
+Minimal example: [`examples/review-first-config.json`](./examples/review-first-config.json)
 
 ## Inputs
 
@@ -106,6 +134,21 @@ This pull request appears to introduce consequential execution surfaces that may
   - Suggested next step: Consider browser checkout governance, finance close packet or a vendor-procurement lane before this merges ungoverned.
 ```
 
+## What a good install looks like
+
+- the repo already has real code or active pull requests
+- the comment appears only when a consequential surface is introduced
+- the team can read the comment and immediately name the likely NORNR lane
+- the next step is obvious: wrapper, MCP, browser lane, or another named control path
+
+## Dogfooding
+
+Budget Shield is already used in NORNR's own repo via:
+
+- [`/.github/workflows/nornr-pr-comment-audit.yml`](https://github.com/Onechan/NORNR/blob/main/.github/workflows/nornr-pr-comment-audit.yml)
+
+That matters because this action is supposed to feel like trusted review infrastructure, not an experiment we only ask other teams to run.
+
 ## How to think about it
 
 Budget Shield is strongest when it stays narrow:
@@ -121,7 +164,9 @@ It is trying to stop teams from accidentally widening runtime authority without 
 
 - Governance Audit: [nornr.com/governance-audit](https://nornr.com/governance-audit)
 - PR Comment Audit explainer: [nornr.com/pr-comment-audit](https://nornr.com/pr-comment-audit)
+- Spend-aware wrappers: [nornr.com/spend-aware-wrappers](https://nornr.com/spend-aware-wrappers)
 - MCP control layer: [nornr.com/mcp-control-server](https://nornr.com/mcp-control-server)
+- Monthly audit surface: [nornr.com/monthly-close-memo](https://nornr.com/monthly-close-memo)
 
 ## Release discipline
 
@@ -129,4 +174,4 @@ It is trying to stop teams from accidentally widening runtime authority without 
 - create semver tags for every public release
 - keep the action narrow enough that teams trust the comment and do not mute it
 
-See [RELEASING.md](./RELEASING.md) and [UPGRADING.md](./UPGRADING.md).
+See [RELEASING.md](./RELEASING.md), [UPGRADING.md](./UPGRADING.md), and [MARKETPLACE.md](./MARKETPLACE.md).

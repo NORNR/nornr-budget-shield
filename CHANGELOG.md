@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.2
+
+- sharpened public README for faster first install and clearer trust boundaries
+- added a minimal review-first config example
+- added prepared Marketplace release copy
+- documented dogfooding usage in the NORNR monorepo
+
 ## 1.0.0
 
 - first standalone public release of NORNR Budget Shield

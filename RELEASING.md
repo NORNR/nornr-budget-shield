@@ -27,6 +27,25 @@ git push origin v1 --force
 6. create the GitHub release from `v1.0.0`
 7. publish the release in GitHub Marketplace from the release UI
 
+## Marketplace draft
+
+Use this title pattern:
+
+```text
+NORNR Budget Shield v1.0.2 - Review-first PR guardrail for consequential execution
+```
+
+Use the prepared copy in:
+
+- [`MARKETPLACE.md`](./MARKETPLACE.md)
+
+Keep the release notes short, install-first, and concrete:
+
+- what it comments on
+- who should install it
+- one install snippet
+- links to Governance Audit and MCP as the next NORNR surfaces
+
 ## Marketplace rule
 
 Keep the public action repo clean:
