@@ -124,6 +124,12 @@ Minimal example: [`examples/review-first-config.json`](./examples/review-first-c
 
 ## Example PR comment
 
+Review-first PR guardrail for consequential execution:
+
+![NORNR Budget Shield PR comment showing a review-first audit on a pull request](./assets/budget-shield-pr-comment.png)
+
+Caption: Budget Shield comments before consequential runtime power quietly reaches `main`.
+
 ```md
 ### NORNR PR audit
 
