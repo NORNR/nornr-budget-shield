@@ -1,0 +1,27 @@
+{
+  "severity": "review-first",
+  "exclude": [
+    "tests/",
+    "docs/"
+  ],
+  "rules": [
+    {
+      "id": "payments",
+      "label": "Payment or settlement surface",
+      "pattern": "stripe|checkout|invoice|billing|transfer|wallet\\.send",
+      "suggestion": "Route the new spend path through one NORNR lane before merge so review, counterparty posture and finance packet stay explicit."
+    },
+    {
+      "id": "tooling",
+      "label": "Tool or MCP surface",
+      "pattern": "tool_call|function_call|mcp|create_mcp_tools|computer_use|browserbase",
+      "suggestion": "Use the NORNR MCP control server or one governed runtime lane before the new tool surface quietly reaches main."
+    },
+    {
+      "id": "vendors",
+      "label": "External vendor action",
+      "pattern": "openai|anthropic|perplexity|requests\\.(get|post)|fetch\\(|axios\\.(get|post)",
+      "suggestion": "Add a counterparty-aware NORNR path so the new external action clears mandate and review before runtime owns it."
+    }
+  ]
+}

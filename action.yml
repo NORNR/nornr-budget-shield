@@ -1,0 +1,32 @@
+name: NORNR Budget Shield
+description: Comment on a pull request when new tool, payment or vendor-action surfaces appear without an explicit NORNR control story.
+inputs:
+  node-version:
+    description: Node.js version used to run the audit script
+    default: "22"
+    required: false
+  config-path:
+    description: Path to the optional .nornr PR audit config file
+    default: ".nornr-pr-audit.json"
+    required: false
+  severity:
+    description: Advisory posture text for the PR comment
+    default: "advisory"
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Run NORNR PR comment audit
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_EVENT_PATH: ${{ github.event_path }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        NORNR_PR_AUDIT_CONFIG_PATH: ${{ inputs.config-path }}
+        NORNR_PR_AUDIT_SEVERITY: ${{ inputs.severity }}
+      run: node "$GITHUB_ACTION_PATH/index.js"
